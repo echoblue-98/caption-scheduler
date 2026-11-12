@@ -65,7 +65,56 @@ FAIL: 2 problems found
 
 If the command itself is wrong, for example `--at` is missing, you get exit code `2`.
 
-### Running the tests
+## Sending a post to n8n: `send_post.py`
+
+`send_post.py` checks a post with `caption_check.py`, then sends it to your n8n webhook. It uses only the standard library.
+
+### Setup
+
+1. Copy `.env.example` to `.env` in the repo root.
+2. In `.env`, set `N8N_WEBHOOK_URL` to your n8n webhook URL and `N8N_SECRET` to the shared secret your workflow expects.
+
+`.env` is ignored by git, so your real values stay on your computer. Never put real values in `.env.example`.
+
+### Running it
+
+```sh
+python send_post.py examples/sample_post.txt --at "2026-12-01 18:30" --video "https://example.com/clip.mp4"
+```
+
+| Option | Meaning |
+| --- | --- |
+| `--at "YYYY-MM-DD HH:MM"` | Required. The post time, in your computer's local time. The script converts it to UTC. |
+| `--video URL` | Required. A public `http://` or `https://` URL of the video. |
+| `--dry-run` | Shows the payload and target URL without sending anything. The secret is shown as `****`. |
+
+What the script does:
+
+1. It checks the post with the same rules as `caption_check.py`. If the post fails, it lists the problems, sends nothing and exits with code `1`.
+2. It reads `N8N_WEBHOOK_URL` and `N8N_SECRET` from `.env`. If either is missing, it tells you which one and exits with code `1`.
+3. It sends a JSON `POST` to the webhook with the header `X-Webhook-Secret: <N8N_SECRET>`. It waits up to 15 seconds for an answer.
+4. If the webhook answers with a 2xx status, it prints the reply and exits with code `0`. If the network fails or the webhook answers with any other status, it prints the status code and response body, then exits with code `1`.
+
+The secret is never printed.
+
+### Payload
+
+```json
+{
+  "title": "Three Pasta Hacks You Need",
+  "caption": "Save this for your next busy weeknight! ...",
+  "hashtags": ["#pasta", "#cookinghacks", "#easyrecipes", "#dinnerideas", "#foodtok"],
+  "text": "Three Pasta Hacks You Need\n\nSave this for your next busy weeknight! ...\n\n#pasta #cookinghacks #easyrecipes #dinnerideas #foodtok",
+  "video_url": "https://example.com/clip.mp4",
+  "scheduled_time_utc": "2026-12-01T23:30:00Z"
+}
+```
+
+- `title` has the surrounding double quotes removed.
+- `text` is the full text TikTok should show: the title, the caption and the hashtags, separated by blank lines. The short lines are not included.
+- `scheduled_time_utc` is `--at` converted from local time to UTC. The example above is for US Eastern time.
+
+## Running the tests
 
 ```sh
 python -m unittest discover -s tests -v
