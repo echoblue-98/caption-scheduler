@@ -104,14 +104,14 @@ The secret is never printed.
   "title": "Three Pasta Hacks You Need",
   "caption": "Save this for your next busy weeknight! ...",
   "hashtags": ["#pasta", "#cookinghacks", "#easyrecipes", "#dinnerideas", "#foodtok"],
-  "text": "Three Pasta Hacks You Need\n\nSave this for your next busy weeknight! ...\n\n#pasta #cookinghacks #easyrecipes #dinnerideas #foodtok",
+  "text": "Three Pasta Hacks You Need\n\nDinner in 10 minutes.\nNo fancy tools required.\n\nSave this for your next busy weeknight! ...\n\n#pasta #cookinghacks #easyrecipes #dinnerideas #foodtok",
   "video_url": "https://example.com/clip.mp4",
   "scheduled_time_utc": "2026-12-01T23:30:00Z"
 }
 ```
 
 - `title` has the surrounding double quotes removed.
-- `text` is the full text TikTok should show: the title, the caption and the hashtags, separated by blank lines. The short lines are not included.
+- `text` is the full text TikTok should show: the title, the short lines, the caption and the hashtags, separated by blank lines. Each short line is on its own line. If there are no short lines, that part is left out.
 - `scheduled_time_utc` is `--at` converted from local time to UTC. The example above is for US Eastern time.
 
 ## Running the tests

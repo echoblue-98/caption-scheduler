@@ -96,8 +96,9 @@ def build_payload(post: cc.Post, video_url: str, scheduled_utc: str) -> dict:
     title = strip_title_quotes(post.title or "")
     caption = post.caption or ""
     hashtags = cc.split_hashtags(post.hashtags_raw or "")
-    text = "\n\n".join(part for part in (title, caption, " ".join(hashtags))
-                       if part)
+    short_lines = "\n".join(post.short_lines)
+    text = "\n\n".join(part for part in (title, short_lines, caption,
+                                         " ".join(hashtags)) if part)
     return {
         "title": title,
         "caption": caption,

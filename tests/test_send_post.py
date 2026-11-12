@@ -75,10 +75,25 @@ class PayloadTests(unittest.TestCase):
             "title": "My Video Title",
             "caption": "This is the caption.",
             "hashtags": ["#one", "#two", "#three"],
-            "text": "My Video Title\n\nThis is the caption.\n\n#one #two #three",
+            "text": "My Video Title\n\nShort line one\n\n"
+                    "This is the caption.\n\n#one #two #three",
             "video_url": VIDEO,
             "scheduled_time_utc": "2026-12-02T00:30:00Z",
         })
+
+    def test_text_with_several_short_lines(self):
+        post = cc.parse_post(GOOD.replace("Short line one\n",
+                                          "Short line one\nShort line two\n"))
+        payload = sp.build_payload(post, VIDEO, "2026-12-02T00:30:00Z")
+        self.assertEqual(payload["text"],
+                         "My Video Title\n\nShort line one\nShort line two\n\n"
+                         "This is the caption.\n\n#one #two #three")
+
+    def test_text_without_short_lines(self):
+        post = cc.parse_post(GOOD.replace("Short line one\n", ""))
+        payload = sp.build_payload(post, VIDEO, "2026-12-02T00:30:00Z")
+        self.assertEqual(payload["text"],
+                         "My Video Title\n\nThis is the caption.\n\n#one #two #three")
 
     def test_payload_is_json_serializable(self):
         post = cc.parse_post(GOOD)
